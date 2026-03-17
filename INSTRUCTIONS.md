@@ -1,42 +1,52 @@
-# aufklearung - AI News Curator for Immigrants
+# Aufklärung - AI News Curator for Immigrants & Dutch Learners
 
-I want to build a Python application with these specifications:
+A Telegram bot that helps immigrants in the Netherlands stay informed while learning Dutch. The bot delivers daily news summaries about immigration-related topics, personalized to each user's language preferences and Dutch proficiency level.
 
-## CORE FUNCTIONALITY
+## 🎯 Core Functionality
+
 Two AI agents working together:
 
 **Agent 1: News Curator**
-- Fetches RSS feeds from Dutch news sources (start with nos.nl and nu.nl)
-- Filters articles using keywords: ['immigrant', 'buitenlander', 'integratie', 'statushouder', 'vluchteling', 'asielzoeker']
-- Returns top 5 most relevant articles from last 24 hours
+- Fetches RSS feeds from Dutch news sources (NOS.nl and NU.nl)
+- Filters articles using keywords related to immigration and integration
+- Returns top 3 most relevant articles from the last 24 hours
 
-**Agent 2: Personalizer/Translator**
-- Takes each article and user preferences (country of origin, Dutch language level)
-- If user chooses native language: Summarize article in their language (Turkish/Arabic/Polish/etc.)
-- If user chooses Dutch learning: Rewrite article at B1/B2 level with simplified Dutch
-- Add cultural context notes in parentheses where helpful
+**Agent 2: Personalizer/Translator** (using Claude AI)
+- Takes each article and user preferences
+- Two modes of operation:
+  - **Native Language Mode**: Summarizes articles in user's native language (Turkish/Arabic/Farsi) with cultural context notes
+  - **Dutch Learning Mode**: Rewrites articles in simplified Dutch at A2/B1/B2 levels with vocabulary explanations
+- Adds cultural context notes in parentheses where helpful for integration
 
-## TECHNICAL REQUIREMENTS
-- Use feedparser library for RSS
-- Use python-telegram-bot for Telegram integration
-- Store user preferences in simple JSON file (start simple)
-- Environment variables for API keys
+## 🤖 Bot Features
 
-## FILE STRUCTURE
-Create:
-- main.py (orchestrator)
-- curator.py (Agent 1 - RSS fetching and filtering)
-- personalizer.py (Agent 2 - LLM prompts)
-- telegram_bot.py (Telegram interface)
-- config.py (settings and environment variables)
-- requirements.txt (dependencies)
-- .env.example (template for API keys)
-- users.json (simple storage for user preferences)
+### User Flow
+1. User sends `/start` command
+2. Bot presents a single keyboard with all options:
+   - 🇹🇷 Türkçe (Turkish)
+   - 🇦🇪 العربية (Arabic)
+   - 🇮🇷 فارسی (Farsi)
+   - 🇳🇱 Nederlands - A2 (Beginner)
+   - 🇳🇱 Nederlands - B1 (Intermediate)
+   - 🇳🇱 Nederlands - B2 (Advanced)
 
-## FIRST VERSION
-Start with a Telegram bot that:
-1. User sends /start and chooses language (Turkish/Arabic/Polish)
-2. Bot sends daily digest of 3 simplified news items
-3. Each item has: Headline (simplified), 2-3 sentence summary, original link
+3. Based on selection:
+   - **Native languages**: News summaries in chosen language
+   - **Dutch levels**: News summaries in simplified Dutch at the selected CEFR level
 
-Please generate all files with working code.
+4. Bot sends 3 most relevant news items, each with:
+   - Simplified headline/summary (in chosen language/level)
+   - Original article link for further reading
+
+### Additional Commands
+- `/news` - Get a fresh digest immediately
+- The bot automatically remembers user preferences
+
+## 🛠 Technical Stack
+
+- **Python 3.12+**
+- **python-telegram-bot** (v20+) - Telegram integration
+- **feedparser** - RSS feed fetching
+- **Anthropic Claude API** - Text summarization and translation
+- **python-dotenv** - Environment variable management
+- **JSON file** - Simple user preference storage
