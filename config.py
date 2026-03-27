@@ -13,53 +13,32 @@ class Settings:
     # Telegram
     telegram_bot_token: str
     
-    # OpenAI (optional now)
-    openai_api_key: Optional[str]
-    openai_model: str
-    
-    # Anthropic (added)
+    # Anthropic
     anthropic_api_key: Optional[str]
     anthropic_model: str
     
-    # RSS and news settings
+    # RSS and news settings — prioritized domestic feeds
     rss_feeds: List[str]
-    keywords: List[str]
 
 
 def get_settings() -> Settings:
     # Telegram
     telegram_bot_token = os.getenv("TELEGRAM_BOT_TOKEN", "")
     
-    # OpenAI (optional)
-    openai_api_key = os.getenv("OPENAI_API_KEY", "")
-    openai_model = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
-    
-    # Anthropic - using your discovered model
+    # Anthropic
     anthropic_api_key = os.getenv("ANTHROPIC_API_KEY", "")
-    anthropic_model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")  # Default to your working model
+    anthropic_model = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
     
-    # RSS feeds
+    # RSS feeds — domestic-focused first
     rss_feeds = [
-        "https://feeds.nos.nl/nosnieuwsalgemeen",
-        "https://www.nu.nl/rss/Algemeen",
-    ]
-    
-    # Keywords for filtering immigrant-related news
-    keywords = [
-        "immigrant",
-        "buitenlander",
-        "integratie",
-        "statushouder",
-        "vluchteling",
-        "asielzoeker",
+        "https://feeds.nos.nl/nosnieuwsbinnenland",      # NL domestic news (best)
+        "https://www.nu.nl/rss/binnenland",              # NL domestic (if available)
+        "https://feeds.nos.nl/nosnieuwsalgemeen",        # General (fallback)
     ]
     
     return Settings(
         telegram_bot_token=telegram_bot_token,
-        openai_api_key=openai_api_key,
-        openai_model=openai_model,
         anthropic_api_key=anthropic_api_key,
         anthropic_model=anthropic_model,
         rss_feeds=rss_feeds,
-        keywords=keywords,
     )

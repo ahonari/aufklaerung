@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Iterable, List
+from typing import Dict, List, Optional
 
 import feedparser
 
@@ -16,6 +16,61 @@ class Article:
     link: str
     published: datetime | None
     source: str
+    category: Optional[str] = None
+
+
+CATEGORY_KEYWORDS: Dict[str, List[str]] = {
+    '🪪 Integration': [  # Priority 1 - most relevant to immigrants
+        'inburgering', 'inburgeren', 'inburgeringscursus', 'inburgeringsexamen',
+        'statushouder', 'asiel', 'asielzoeker', 'vluchteling', 'immigrant',
+        'migrant', 'integratie', 'naturalisatie', 'verblijfsvergunning', 'ind',
+        'taal', 'taalcursus', 'nt2', 'nederlands leren', 'inburgeringsplicht'
+    ],
+    '🏠 Housing': [  # Priority 2
+        'woning', 'woningmarkt', 'huur', 'huurwoning', 'huurprijs', 'huurverhoging',
+        'koop', 'koopwoning', 'hypotheek', 'sociale huur', 'woningcorporatie',
+        'huisvesting', 'woningnood', 'starterslening', 'huurtoeslag'
+    ],
+    '💼 Work & Economy': [
+        'werk', 'baan', 'werkloosheid', 'werkloos', 'vacature', 'solliciteren',
+        'salaris', 'loon', 'minimumloon', 'cao', 'contract', 'ontslag',
+        'zzp', 'freelance', 'ondernemer', 'economie', 'inflatie', 'belasting',
+        'arbeidsmarkt', 'werknemer', 'werkgever'
+    ],
+    '🏛️ Politics': [
+        'kamer', 'wet', 'gemeenteraad', 'verkiezingen', 'beleid', 'minister',
+        'kabinet', 'partij', 'stemmen', 'politiek', 'tweede kamer'
+    ],
+    '📚 Education': [
+        'school', 'basisschool', 'middelbare school', 'vmbo', 'havo', 'vwo',
+        'mbo', 'hbo', 'universiteit', 'student', 'studie', 'diploma',
+        'opleiding', 'cursus', 'volwasseneneducatie', 'nt2'
+    ],
+    '🏥 Health': [
+        'zorg', 'huisarts', 'ziekenhuis', 'ggd', 'zorgverzekering', 
+        'zorgverzekeraar', 'eigen risico', 'apotheek', 'medicijn'
+    ],
+    '🌍 Culture': [
+        'feest', 'traditie', 'vrijwilliger', 'sport', 'evenement',
+        'koningsdag', 'sinterklaas', 'cultuur', 'festival', 'museum'
+    ],
+    '🚆 Transport': [  # Priority lowest
+        'ov', 'ns', 'trein', 'bus', 'tram', 'metro', 'ov-chipkaart',
+        'rijbewijs', 'cbr', 'auto', 'verkeer', 'spoor', 'wegwerkzaamheden'
+    ],
+}
+
+
+def _get_category(text: str) -> Optional[str]:
+    """Determine article category based on keyword matching."""
+    lower_text = text.lower()
+    
+    for category, keywords in CATEGORY_KEYWORDS.items():
+        for keyword in keywords:
+            if keyword.lower() in lower_text:
+                return category
+    
+    return None
 
 
 def _entry_published(entry) -> datetime | None:
@@ -25,18 +80,72 @@ def _entry_published(entry) -> datetime | None:
     return datetime(*published_parsed[:6], tzinfo=timezone.utc)
 
 
-def _contains_keyword(text: str, keywords: Iterable[str]) -> bool:
-    lower = text.lower()
-    return any(kw.lower() in lower for kw in keywords)
+def _is_relevant_to_netherlands(text: str) -> bool:
+    """Filter out purely international news."""
+    lower_text = text.lower()
+    
+    dutch_keywords = [
+        # Places & Government
+        'nederland', 'nederlands', 'amsterdam', 'rotterdam', 'den haag', 
+        'utrecht', 'eindhoven', 'groningen', 'maastricht', 'tilburg',
+        'gemeente', 'provincie', 'minister', 'kamer', 'parlement', 
+        'wet', 'regel', 'beleid', 'burgemeester', 'wethouder',
+        
+        # Integration
+        'inburgering', 'inburgeren', 'inburgeringscursus', 'inburgeringsexamen',
+        'statushouder', 'asiel', 'asielzoeker', 'vluchteling', 'immigrant', 
+        'migrant', 'integratie', 'naturalisatie', 'paspoort', 'verblijfsvergunning',
+        'verblijfsdocument', 'vreemdeling', 'ind', 'immigratie',
+        'taal', 'taalcursus', 'nt2', 'nederlands leren',
+        
+        # Housing
+        'woning', 'woningmarkt', 'huur', 'huurwoning', 'huurprijs', 'huurverhoging',
+        'koop', 'koopwoning', 'hypotheek', 'sociale huur', 'woningcorporatie',
+        'huisvesting', 'woningnood', 'starterslening', 'huurtoeslag',
+        
+        # Work & Economy
+        'werk', 'baan', 'werkloosheid', 'werkloos', 'vacature', 'solliciteren',
+        'salaris', 'loon', 'minimumloon', 'cao', 'contract', 'ontslag',
+        'zzp', 'freelance', 'ondernemer', 'economie', 'inflatie',
+        'belasting', 'toeslag', 'zorgtoeslag', 'huurtoeslag', 'kinderopvangtoeslag',
+        
+        # Education
+        'school', 'basisschool', 'middelbare school', 'vmbo', 'havo', 'vwo',
+        'mbo', 'hbo', 'universiteit', 'student', 'studie', 'diploma', 
+        'opleiding', 'cursus', 'volwasseneneducatie', 'rocin',
+        
+        # Healthcare
+        'zorg', 'huisarts', 'ziekenhuis', 'ggd', 'zorgverzekering', 
+        'zorgverzekeraar', 'eigen risico', 'apotheek', 'medicijn', 'ggz',
+        
+        # Transport
+        'ov', 'ns', 'trein', 'bus', 'tram', 'metro', 'ov-chipkaart',
+        'rijbewijs', 'cbr', 'auto', 'verkeer', 'file',
+        
+        # Culture
+        'koningsdag', 'sinterklaas', 'kerst', 'pasen', 'bevrijdingsdag',
+        'cultuur', 'traditie', 'feest', 'vrijwilliger', 'sport', 'voetbal',
+        
+        # Domestic context
+        'nederlandse', 'nederlands', 'in nederland', 'voor nederland',
+        'nieuwkomers', 'expat', 'arbeidsmigrant', 'kennismigrant',
+    ]
+    
+    for keyword in dutch_keywords:
+        if keyword in lower_text:
+            return True
+    
+    return False
 
 
 def fetch_relevant_articles(limit: int = 5) -> List[Article]:
-    """Fetch and filter articles from configured RSS feeds."""
+    """Fetch articles with deduplication"""
     settings = get_settings()
     now = datetime.now(timezone.utc)
     cutoff = now - timedelta(days=1)
 
-    collected: List[Article] = []
+    articles: List[Article] = []
+    seen_links = set()  # Track seen URLs
 
     for feed_url in settings.rss_feeds:
         parsed = feedparser.parse(feed_url)
@@ -50,25 +159,33 @@ def fetch_relevant_articles(limit: int = 5) -> List[Article]:
             title = getattr(entry, "title", "")
             summary = getattr(entry, "summary", "") or getattr(entry, "description", "")
             link = getattr(entry, "link", "")
-            text_for_filter = f"{title}\n{summary}"
-
-            if not _contains_keyword(text_for_filter, settings.keywords):
+            
+            if not title or not summary:
                 continue
+            if link in seen_links:  # Skip duplicates
+                continue
+            
+            text_to_check = f"{title} {summary}"
+            
+            if not _is_relevant_to_netherlands(text_to_check):
+                continue
+            
+            category = _get_category(text_to_check)
+            seen_links.add(link)
 
-            collected.append(
-                Article(
-                    title=title,
-                    summary=summary,
-                    link=link,
-                    published=published,
-                    source=source_title,
-                )
+            article = Article(
+                title=title,
+                summary=summary,
+                link=link,
+                published=published,
+                source=source_title,
+                category=category,
             )
+            articles.append(article)
 
-    collected.sort(
-        key=lambda a: a.published or datetime.min.replace(tzinfo=timezone.utc),
+    articles.sort(
+        key=lambda x: x.published or datetime.min.replace(tzinfo=timezone.utc),
         reverse=True,
     )
-
-    return collected[:limit]
-
+    
+    return articles[:limit]
