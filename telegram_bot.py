@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import warnings
 from datetime import datetime, timedelta
@@ -20,7 +21,14 @@ from config import get_settings
 from curator import fetch_relevant_articles
 from personalizer import UserPreferences, personalize_article
 
-import asyncio
+# Import analytics
+from analytics import (
+    track_user_seen,
+    track_command,
+    track_articles_delivered,
+    track_preferences,
+    get_analytics_summary
+)
 
 
 warnings.filterwarnings("ignore", message=r".*CallbackQueryHandler", category=PTBUserWarning)
@@ -94,6 +102,7 @@ def _prefs_from_dict(chat_id: int, data: Dict) -> UserPreferences:
         country_of_origin=None,
     )
 
+
 async def personalize_article_with_retry(article, prefs, max_retries: int = 3) -> str:
     """Call the LLM with retry on overload"""
     for attempt in range(max_retries):
@@ -110,9 +119,6 @@ async def personalize_article_with_retry(article, prefs, max_retries: int = 3) -
                 raise
     raise Exception("Max retries exceeded")
 
-
-async def send_news_digest(chat_id: int, context: CallbackContext) -> None:
-    """Send news digest to user based on their intensity setting"""
 
 def fetch_recent_articles(limit: int = 5) -> list:
     """Fetch articles from the last 24 hours."""
@@ -145,6 +151,10 @@ async def start(update: Update, context: CallbackContext) -> int:
     
     chat_id = update.effective_chat.id
     _get_or_create_user(chat_id)
+    
+    # Track analytics
+    track_user_seen(chat_id)
+    track_command(chat_id, "start")
 
     keyboard = [
         [InlineKeyboardButton("📰 Read news in my language", callback_data="mode_native")],
@@ -170,8 +180,19 @@ async def mode_selected(update: Update, context: CallbackContext) -> int:
     if query is None or query.message is None or query.from_user is None:
         return ConversationHandler.END
 
-    await query.answer()
+    try:
+        await query.answer()
+    except Exception as e:
+        # Query expired - user took too long to click
+        print(f"Query answer failed (expired): {e}")
+        return ConversationHandler.END
+    
+    chat_id = query.from_user.id
     data = query.data or ""
+    
+    # Track mode selection
+    track_user_seen(chat_id)
+    track_command(chat_id, f"mode_{data}")
     
     if data == "mode_native":
         context.user_data['selected_mode'] = "native"
@@ -186,6 +207,7 @@ async def mode_selected(update: Update, context: CallbackContext) -> int:
             [InlineKeyboardButton("🇮🇹 Italiano", callback_data="lang_it")],
             [InlineKeyboardButton("🇷🇴 Română", callback_data="lang_ro")],
             [InlineKeyboardButton("🇧🇬 Български", callback_data="lang_bg")],
+            [InlineKeyboardButton("🇪🇸 Español", callback_data="lang_es")], 
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -210,6 +232,7 @@ async def mode_selected(update: Update, context: CallbackContext) -> int:
             [InlineKeyboardButton("🇮🇹 Italiano", callback_data="dutch_native_it")],
             [InlineKeyboardButton("🇷🇴 Română", callback_data="dutch_native_ro")],
             [InlineKeyboardButton("🇧🇬 Български", callback_data="dutch_native_bg")],
+            [InlineKeyboardButton("🇪🇸 Español", callback_data="dutch_native_es")],
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
@@ -231,21 +254,31 @@ async def native_language_selected(update: Update, context: CallbackContext) -> 
     if query is None or query.message is None or query.from_user is None:
         return ConversationHandler.END
 
-    await query.answer()
+    try:
+        await query.answer()
+    except Exception as e:
+        print(f"Query answer failed (expired): {e}")
+        return ConversationHandler.END
+    
     chat_id = query.from_user.id
     data = query.data or ""
+    
+    track_user_seen(chat_id)
+    track_command(chat_id, "lang_selection")
     
     lang_map = {
         "lang_tr": "tr", "lang_pl": "pl", "lang_ar": "ar",
         "lang_uk": "uk", "lang_fr": "fr", "lang_fa": "fa",
         "lang_it": "it", "lang_ro": "ro", "lang_bg": "bg",
+        "lang_es": "es",
     }
     
     language = lang_map.get(data, "tr")
     lang_names = {
         "tr": "Turkish", "pl": "Polish", "ar": "Arabic",
         "uk": "Ukrainian", "fr": "French", "fa": "Farsi",
-        "it": "Italian", "ro": "Romanian", "bg": "Bulgarian"
+        "it": "Italian", "ro": "Romanian", "bg": "Bulgarian",
+        "es": "Spanish"
     }
     lang_name = lang_names.get(language, "your language")
     
@@ -273,20 +306,31 @@ async def dutch_native_selected(update: Update, context: CallbackContext) -> int
     if query is None or query.message is None or query.from_user is None:
         return ConversationHandler.END
 
-    await query.answer()
+    try:
+        await query.answer()
+    except Exception as e:
+        print(f"Query answer failed (expired): {e}")
+        return ConversationHandler.END
+    
+    chat_id = query.from_user.id
     data = query.data or ""
+    
+    track_user_seen(chat_id)
+    track_command(chat_id, "dutch_native_selection")
     
     native_map = {
         "dutch_native_tr": "tr", "dutch_native_pl": "pl", "dutch_native_ar": "ar",
         "dutch_native_uk": "uk", "dutch_native_fr": "fr", "dutch_native_fa": "fa",
         "dutch_native_it": "it", "dutch_native_ro": "ro", "dutch_native_bg": "bg",
+        "dutch_native_es": "es",
     }
     
     native_language = native_map.get(data, "tr")
     native_names = {
         "tr": "Turkish", "pl": "Polish", "ar": "Arabic",
         "uk": "Ukrainian", "fr": "French", "fa": "Farsi",
-        "it": "Italian", "ro": "Romanian", "bg": "Bulgarian"
+        "it": "Italian", "ro": "Romanian", "bg": "Bulgarian",
+        "es": "Spanish"
     }
     native_name = native_names.get(native_language, "your language")
     
@@ -314,8 +358,17 @@ async def dutch_level_selected(update: Update, context: CallbackContext) -> int:
     if query is None or query.message is None or query.from_user is None:
         return ConversationHandler.END
 
-    await query.answer()
+    try:
+        await query.answer()
+    except Exception as e:
+        print(f"Query answer failed (expired): {e}")
+        return ConversationHandler.END
+    
+    chat_id = query.from_user.id
     data = query.data or ""
+    
+    track_user_seen(chat_id)
+    track_command(chat_id, "level_selection")
     
     level_map = {
         "level_a2": "A2",
@@ -347,9 +400,17 @@ async def intensity_selected(update: Update, context: CallbackContext) -> int:
     if query is None or query.message is None or query.from_user is None:
         return ConversationHandler.END
 
-    await query.answer()
+    try:
+        await query.answer()
+    except Exception as e:
+        print(f"Query answer failed (expired): {e}")
+        return ConversationHandler.END
+    
     chat_id = query.from_user.id
     data = query.data or ""
+    
+    track_user_seen(chat_id)
+    track_command(chat_id, "intensity_selection")
     
     intensity_map = {
         "intensity_2": 2,
@@ -371,6 +432,9 @@ async def intensity_selected(update: Update, context: CallbackContext) -> int:
             dutch_level=None,
             intensity=intensity
         )
+        
+        # Track preferences
+        track_preferences(chat_id, mode="native", language=language, intensity=intensity)
         
         context.user_data.clear()
         
@@ -396,6 +460,15 @@ async def intensity_selected(update: Update, context: CallbackContext) -> int:
             mode="dutch",
             dutch_level=dutch_level,
             intensity=intensity
+        )
+        
+        # Track preferences
+        track_preferences(
+            chat_id, 
+            mode="dutch", 
+            language=native_language,
+            intensity=intensity, 
+            dutch_level=dutch_level
         )
         
         context.user_data.clear()
@@ -438,9 +511,12 @@ async def send_news_digest(chat_id: int, context: CallbackContext) -> None:
     
     prefs = _prefs_from_dict(chat_id, user_dict)
     
+    # Track articles delivered
+    track_articles_delivered(chat_id, len(articles))
+    
     for i, article in enumerate(articles, 1):
         try:
-            personalized = personalize_article(article, prefs)
+            personalized = await personalize_article_with_retry(article, prefs)
         except Exception as e:
             print(f"Error personalizing article: {e}")
             print(f"User prefs: {prefs}")
@@ -464,7 +540,7 @@ async def send_news_digest(chat_id: int, context: CallbackContext) -> None:
         await context.bot.send_message(
             chat_id=chat_id,
             text=message,
-            parse_mode=None  # ← Disable Markdown parsing
+            parse_mode=None  # Disable Markdown parsing
         )
     
     await context.bot.send_message(
@@ -479,6 +555,10 @@ async def news_command(update: Update, context: CallbackContext) -> None:
     if update.effective_chat is None:
         return
     chat_id = update.effective_chat.id
+    
+    # Track analytics
+    track_user_seen(chat_id)
+    track_command(chat_id, "news")
     
     user_dict = _get_or_create_user(chat_id)
     if user_dict.get("mode") is None:
@@ -496,6 +576,10 @@ async def settings_command(update: Update, context: CallbackContext) -> None:
         return
     chat_id = update.effective_chat.id
     
+    # Track analytics
+    track_user_seen(chat_id)
+    track_command(chat_id, "settings")
+    
     user_dict = _get_or_create_user(chat_id)
     
     if user_dict.get("mode") is None:
@@ -510,7 +594,8 @@ async def settings_command(update: Update, context: CallbackContext) -> None:
     lang_names = {
         "tr": "🇹🇷 Turkish", "pl": "🇵🇱 Polish", "ar": "🇦🇪 Arabic",
         "uk": "🇺🇦 Ukrainian", "fr": "🇫🇷 French", "fa": "🇮🇷 Farsi",
-        "it": "🇮🇹 Italian", "ro": "🇷🇴 Romanian", "bg": "🇧🇬 Bulgarian"
+        "it": "🇮🇹 Italian", "ro": "🇷🇴 Romanian", "bg": "🇧🇬 Bulgarian",
+        "es": "🇪🇸 Spanish"
     }
     
     if mode == "native":
@@ -554,9 +639,18 @@ async def settings_callback(update: Update, context: CallbackContext) -> None:
     if query is None or query.message is None or query.from_user is None:
         return
 
-    await query.answer()
+    try:
+        await query.answer()
+    except Exception as e:
+        print(f"Query answer failed (expired): {e}")
+        return
+    
     chat_id = query.from_user.id
     data = query.data or ""
+    
+    # Track reset
+    track_user_seen(chat_id)
+    track_command(chat_id, "reset_preferences")
     
     if data == "reset_preferences":
         # Reset user preferences
@@ -572,22 +666,23 @@ async def settings_callback(update: Update, context: CallbackContext) -> None:
         # Delete the settings message
         await query.message.delete()
         
-        # Create a fake update to start the conversation fresh
-        # Create a new message with the same chat_id
+        # Send reset confirmation
         await context.bot.send_message(
             chat_id=chat_id,
-            text="🔄 Preferences reset. Let's set up again!"
+            text="🔄 Preferences reset. Please type /start to set up again."
         )
-        
-        # Now call start manually with a new message context
-        # This is tricky - simpler: tell user to type /start
-        await context.bot.send_message(
-            chat_id=chat_id,
-            text="Please type /start to begin setup."
-        )
+
 
 async def help_command(update: Update, context: CallbackContext) -> None:
     """Handle /help command"""
+    if update.effective_chat is None:
+        return
+    chat_id = update.effective_chat.id
+    
+    # Track analytics
+    track_user_seen(chat_id)
+    track_command(chat_id, "help")
+    
     help_text = (
         "📖 *StepIn Bot Help*\n\n"
         "*Commands:*\n"
@@ -608,6 +703,48 @@ async def help_command(update: Update, context: CallbackContext) -> None:
     )
     
     await update.message.reply_text(help_text, parse_mode='Markdown')
+
+
+async def stats_command(update: Update, context: CallbackContext) -> None:
+    """Handle /stats command - view analytics (admin only)"""
+    if update.effective_chat is None:
+        return
+    
+    chat_id = update.effective_chat.id
+    
+    # Optional: Restrict to specific admin user IDs
+    # Uncomment and add your Telegram user ID
+    # admin_ids = [123456789]  # Your Telegram user ID
+    # if chat_id not in admin_ids:
+    #     await update.message.reply_text("Unauthorized.")
+    #     return
+    
+    stats = get_analytics_summary()
+    
+    # Format preferences nicely
+    lang_stats = "\n".join([f"  • {lang}: {count}" for lang, count in stats["preferences"]["languages"].items()])
+    intensity_stats = "\n".join([f"  • {intensity} articles: {count}" for intensity, count in stats["preferences"]["intensities"].items()])
+    
+    message = (
+        f"📊 *StepIn Analytics*\n\n"
+        f"*Users*\n"
+        f"• Total users: {stats['total_users']}\n"
+        f"• Active (30d): {stats['active_users_30d']}\n"
+        f"• Active (7d): {stats['active_users_7d']}\n\n"
+        f"*Content*\n"
+        f"• Articles delivered: {stats['total_articles_delivered']:,}\n"
+        f"• Daily avg: {stats['daily_avg_articles']:.0f}\n\n"
+        f"*Commands*\n"
+        f"• Most used: {stats['top_commands'][0][0]} ({stats['top_commands'][0][1]} times)\n\n"
+        f"*Preferences*\n"
+        f"• Native mode: {stats['preferences']['native']}\n"
+        f"• Dutch learner mode: {stats['preferences']['dutch']}\n"
+        f"• Languages:\n{lang_stats or '  • None'}\n"
+        f"• Intensities:\n{intensity_stats}\n"
+        f"• Dutch levels: A2: {stats['preferences']['dutch_levels']['A2']}, B1: {stats['preferences']['dutch_levels']['B1']}, B2: {stats['preferences']['dutch_levels']['B2']}\n"
+    )
+    
+    await update.message.reply_text(message, parse_mode='Markdown')
 
 
 def build_application() -> Application:
@@ -646,6 +783,7 @@ def build_application() -> Application:
     application.add_handler(CommandHandler("news", news_command))
     application.add_handler(CommandHandler("settings", settings_command))
     application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("stats", stats_command))
     application.add_handler(CallbackQueryHandler(settings_callback, pattern=r"^reset_"))
 
     return application

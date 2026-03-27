@@ -1,0 +1,65 @@
+{
+  "total_users": 2,
+  "active_users": [
+    "56049535",
+    "83282264"
+  ],
+  "commands": {
+    "start": 5,
+    "mode_mode_native": 2,
+    "lang_selection": 2,
+    "intensity_selection": 4,
+    "news": 5,
+    "settings": 4,
+    "reset_preferences": 2,
+    "mode_mode_dutch": 3,
+    "dutch_native_selection": 2,
+    "level_selection": 2
+  },
+  "articles_delivered": 13,
+  "preferences": {
+    "native": 2,
+    "dutch": 2,
+    "languages": {
+      "fa": 2
+    },
+    "intensities": {
+      "2": 3,
+      "5": 1
+    },
+    "dutch_levels": {
+      "A2": 1,
+      "B1": 0,
+      "B2": 1
+    }
+  },
+  "daily_activity": {
+    "2026-03-27": {
+      "users": [
+        "56049535",
+        "83282264"
+      ],
+      "commands": {
+        "start": 5,
+        "mode_mode_native": 2,
+        "lang_selection": 2,
+        "intensity_selection": 4,
+        "news": 5,
+        "settings": 4,
+        "reset_preferences": 2,
+        "mode_mode_dutch": 3,
+        "dutch_native_selection": 2,
+        "level_selection": 2
+      },
+      "articles": 13
+    }
+  },
+  "first_seen": {
+    "56049535": "2026-03-27T14:47:43.831577",
+    "83282264": "2026-03-27T16:25:48.011571"
+  },
+  "last_seen": {
+    "56049535": "2026-03-27T16:29:34.072191",
+    "83282264": "2026-03-27T16:27:36.566952"
+  }
+}

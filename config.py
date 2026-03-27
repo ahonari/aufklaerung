@@ -19,6 +19,10 @@ class Settings:
     
     # RSS and news settings — prioritized domestic feeds
     rss_feeds: List[str]
+    
+    # Admin settings
+    admin_ids: List[int]  # NEW
+
 
 
 def get_settings() -> Settings:
@@ -35,10 +39,16 @@ def get_settings() -> Settings:
         "https://www.nu.nl/rss/binnenland",              # NL domestic (if available)
         "https://feeds.nos.nl/nosnieuwsalgemeen",        # General (fallback)
     ]
+    # Admin IDs - parse from comma-separated string
+    admin_ids_str = os.getenv("ADMIN_IDS", "")
+    admin_ids = []
+    if admin_ids_str:
+        admin_ids = [int(id.strip()) for id in admin_ids_str.split(",") if id.strip()]
     
     return Settings(
         telegram_bot_token=telegram_bot_token,
         anthropic_api_key=anthropic_api_key,
         anthropic_model=anthropic_model,
         rss_feeds=rss_feeds,
+        admin_ids=admin_ids,
     )

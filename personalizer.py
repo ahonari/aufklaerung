@@ -9,30 +9,47 @@ from config import get_settings
 from curator import Article
 
 
-LanguageCode = Literal["tr", "ar", "fa"]
+# Updated language codes to match bot
+LanguageCode = Literal["tr", "pl", "ar", "uk", "fr", "fa", "it", "ro", "bg", "es"]
 Mode = Literal["native", "dutch"]
 
 
 @dataclass
 class UserPreferences:
     chat_id: int
-    language: Optional[LanguageCode] = None  # For native language (used in both modes)
+    language: Optional[LanguageCode] = None  # For native language
     mode: Optional[Mode] = None              # None means not set yet
-    dutch_level: Optional[str] = None        # A2, B1, B2, or None for native
-    country_of_origin: Optional[str] = None
+    dutch_level: Optional[str] = None        # A2, B1, B2
+    country_of_origin: Optional[str] = None  # Not used in MVP
 
 
 def _build_prompt(article: Article, prefs: UserPreferences) -> str:
     """Build the appropriate prompt based on user preferences"""
+    
+    # Map language codes to full names
+    lang_names = {
+        "tr": "Turkish",
+        "pl": "Polish",
+        "ar": "Arabic",
+        "uk": "Ukrainian",
+        "fr": "French",
+        "fa": "Farsi/Persian",
+        "it": "Italian",
+        "ro": "Romanian",
+        "bg": "Bulgarian",
+        "es": "Spanish",
+    }
     
     if prefs.mode == "native":
         # Safety check
         if not prefs.language:
             raise ValueError("Native mode selected but no language specified")
             
+        lang_name = lang_names.get(prefs.language, prefs.language)
+        
         return (
             "You are an assistant helping immigrants in the Netherlands understand news.\n"
-            f"User native language code: {prefs.language}.\n"
+            f"The user's native language is {lang_name}.\n"
             "Task: Summarize the Dutch news article below in the user's native language.\n"
             "Requirements:\n"
             "- Use simple, clear language.\n"
@@ -51,9 +68,6 @@ def _build_prompt(article: Article, prefs: UserPreferences) -> str:
             
         level = prefs.dutch_level
         native_lang = prefs.language
-        
-        # Map language codes to full names for better prompting
-        lang_names = {"tr": "Turkish", "ar": "Arabic", "fa": "Farsi/Persian"}
         lang_name = lang_names.get(native_lang, native_lang)
         
         return (
@@ -69,9 +83,9 @@ def _build_prompt(article: Article, prefs: UserPreferences) -> str:
             "- **[Dutch word/phrase]** = [translation in user's native language]\n"
             "- **[Dutch word/phrase]** = [translation in user's native language]\n\n"
             "Requirements:\n"
-            "- Dutch summary: Use CEFR level {level} (simple sentences, common words)\n"
+            f"- Dutch summary: Use CEFR level {level} (simple sentences, common words)\n"
             "- Vocabulary: Pick 3-5 important words from the article\n"
-            "- Translations: Provide accurate translations in {lang_name}\n"
+            f"- Translations: Provide accurate translations in {lang_name}\n"
             "- Include a mix of individual words and short phrases\n"
             "- Make sure vocabulary words appear in the Dutch summary\n\n"
             f"ARTICLE TITLE: {article.title}\n"
@@ -91,7 +105,7 @@ def personalize_article(article: Article, prefs: UserPreferences) -> str:
     
     settings = get_settings()
 
-    # Initialize Anthropic client with correct API version
+    # Initialize Anthropic client
     client = Anthropic(
         api_key=settings.anthropic_api_key,
         default_headers={
@@ -101,10 +115,9 @@ def personalize_article(article: Article, prefs: UserPreferences) -> str:
 
     prompt = _build_prompt(article, prefs)
 
-    # Using Claude Sonnet 4.6
     response = client.messages.create(
         model=settings.anthropic_model,
-        max_tokens=500,  # Increased for vocabulary list
+        max_tokens=500,
         temperature=0.4,
         messages=[
             {
