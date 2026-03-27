@@ -14,7 +14,8 @@
     "reset_preferences": 2,
     "mode_mode_dutch": 3,
     "dutch_native_selection": 2,
-    "level_selection": 2
+    "level_selection": 2,
+    "help": 1
   },
   "articles_delivered": 13,
   "preferences": {
@@ -49,7 +50,8 @@
         "reset_preferences": 2,
         "mode_mode_dutch": 3,
         "dutch_native_selection": 2,
-        "level_selection": 2
+        "level_selection": 2,
+        "help": 1
       },
       "articles": 13
     }
@@ -59,7 +61,7 @@
     "83282264": "2026-03-27T16:25:48.011571"
   },
   "last_seen": {
-    "56049535": "2026-03-27T16:29:34.072191",
+    "56049535": "2026-03-27T21:48:53.839868",
     "83282264": "2026-03-27T16:27:36.566952"
   }
 }

@@ -698,7 +698,7 @@ async def help_command(update: Update, context: CallbackContext) -> None:
         "3. Choose how many articles per day\n"
         "4. Use /news whenever you're ready to read\n\n"
         "*Need support?*\n"
-        "Contact: hello@stepin.app\n\n"
+        "Contact: stepIn@danalytica.com\n\n"
         "📌 Tip: Use /settings to restart setup anytime."
     )
     
