@@ -1363,7 +1363,7 @@
           <div class="avatars">
             <span>🇺🇦</span><span>🇹🇷</span><span>🇸🇦</span><span>🇵🇱</span><span>🇷🇴</span>
           </div>
-          <span>For immigrants across <strong>10 languages | 100+ countries</strong></span>
+          <span>For immigrants across <strong>12 languages | 100+ countries</strong></span>
         </div>
         <div class="stripe-bar" style="margin-top:28px;max-width:260px;">
           <span></span><span></span><span></span><span></span><span></span>
@@ -1867,6 +1867,9 @@
       <span class="cta-lang-pill">🇮🇹 Italiano</span>
       <span class="cta-lang-pill">🇫🇷 Français</span>
       <span class="cta-lang-pill">🇧🇬 Български</span>
+      <span class="cta-lang-pill">🇪🇸 Español</span>
+      <span class="cta-lang-pill">🇱🇹 Lietuvių</span>
+      <span class="cta-lang-pill">🇷🇺 Русский</span>
     </div>
   </div>
 </section>
@@ -1901,12 +1904,26 @@
       </div>
       <div class="footer-col">
         <h5>Languages</h5>
-        <a href="#">Ukrainian · Oekraïens</a>
-        <a href="#">Turkish · Turks</a>
-        <a href="#">Arabic · Arabisch</a>
-        <a href="#">Farsi · Perzisch</a>
-        <a href="#">Polish · Pools</a>
-        <a href="#">+ 5 more</a>
+        <div id="languageList">
+          <a href="#">Ukrainian · Oekraïens</a>
+          <a href="#">Turkish · Turks</a>
+          <a href="#">Arabic · Arabisch</a>
+          <a href="#">Farsi · Perzisch</a>
+          <a href="#">Polish · Pools</a>
+          
+          <!-- Hidden languages (initially hidden) -->
+          <div id="moreLanguages" style="display: none;">
+            <a href="#">Romanian · Roemeens</a>
+            <a href="#">Italian · Italiaans</a>
+            <a href="#">French · Frans</a>
+            <a href="#">Bulgarian · Bulgaars</a>
+            <a href="#">Spanish · Spaans</a>
+            <a href="#">Lithuanian · Litouws</a>
+            <a href="#">Russian · Russisch</a>
+          </div>
+          
+          <a href="#" id="showMoreLink" style="color: var(--orange); font-weight: 500;">+ 7 more →</a>
+        </div>
       </div>
     </div>
     <div class="footer-bottom">
@@ -2124,6 +2141,24 @@ form.addEventListener('submit', async (e) => {
       el.style.animation = 'none';
     });
   }
+
+
+  const showMoreLink = document.getElementById('showMoreLink');
+  const moreLanguages = document.getElementById('moreLanguages');
+  
+  if (showMoreLink && moreLanguages) {
+    showMoreLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (moreLanguages.style.display === 'none') {
+        moreLanguages.style.display = 'block';
+        showMoreLink.innerHTML = '− show less';
+      } else {
+        moreLanguages.style.display = 'none';
+        showMoreLink.innerHTML = '+ 7 more →';
+      }
+    });
+  }
+
 </script>
 
 </body>
