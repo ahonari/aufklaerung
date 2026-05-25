@@ -1986,36 +1986,70 @@
   }, { threshold: 0.5 });
   if (timelineFill) timelineObserver.observe(timelineFill);
 
-  /* ---- Contact form submit ---- */
+
 /* ---- Contact form submit (Formspree integration) ---- */
 const form = document.getElementById('contactForm');
 const toast = document.getElementById('toast');
 
+function showToast(message, isError = false) {
+  toast.textContent = message;
+  toast.style.borderColor = isError ? 'var(--orange)' : 'var(--s3)';
+  toast.style.opacity = '1';
+  
+  setTimeout(() => { 
+    toast.style.opacity = '0'; 
+  }, 5000);
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
+
+  // Get submit button for loading state
+  const submitButton = form.querySelector('button[type="submit"]');
+  const originalButtonText = submitButton.innerHTML;
+
+  // Reset previous error styles
+  const allFields = form.querySelectorAll('input, select, textarea');
+  allFields.forEach(field => field.style.borderColor = '');
 
   // Basic validation
   const required = form.querySelectorAll('[required]');
   let valid = true;
+  let firstInvalid = null;
+  
   required.forEach(field => {
     if (!field.value.trim()) {
       field.style.borderColor = 'var(--orange)';
       valid = false;
-    } else {
-      field.style.borderColor = '';
+      if (!firstInvalid) firstInvalid = field;
     }
   });
 
+  // Email format validation
+  const emailField = document.getElementById('email');
+  if (emailField && emailField.value.trim() && !isValidEmail(emailField.value.trim())) {
+    emailField.style.borderColor = 'var(--orange)';
+    showToast('⚠️ Please enter a valid email address (e.g., name@domain.com)', true);
+    emailField.focus();
+    return;
+  }
+
   if (!valid) {
-    toast.textContent = '⚠️ Please fill in all required fields.';
-    toast.style.borderColor = 'var(--orange)';
-    toast.style.opacity = '1';
-    setTimeout(() => { toast.style.opacity = '0'; }, 5000);
+    showToast('⚠️ Please fill in all required fields.', true);
+    if (firstInvalid) firstInvalid.focus();
     return;
   }
 
   // Submit to Formspree
   const formData = new FormData(form);
+  
+  // Disable button and show loading state
+  submitButton.disabled = true;
+  submitButton.innerHTML = 'Sending...';
   
   try {
     const response = await fetch(form.action, {
@@ -2025,27 +2059,26 @@ form.addEventListener('submit', async (e) => {
     });
 
     if (response.ok) {
-      toast.textContent = '✅ Message sent! We\'ll be in touch within 2 business days.';
-      toast.style.borderColor = 'var(--s3)';
-      toast.style.opacity = '1';
+      showToast('✅ Message sent! We\'ll be in touch within 2 business days.');
       form.reset();
-      setTimeout(() => { toast.style.opacity = '0'; }, 5000);
+      // Reset select dropdown to default
+      const select = document.getElementById('orgtype');
+      if (select) select.selectedIndex = 0;
     } else {
       const errorData = await response.json();
       if (errorData.errors) {
-        toast.textContent = `❌ ${errorData.errors.map(e => e.message).join(', ')}`;
+        showToast(`❌ ${errorData.errors.map(e => e.message).join(', ')}`, true);
       } else {
-        toast.textContent = '❌ Failed to send. Please try again.';
+        showToast('❌ Failed to send. Please try again.', true);
       }
-      toast.style.borderColor = 'var(--orange)';
-      toast.style.opacity = '1';
-      setTimeout(() => { toast.style.opacity = '0'; }, 5000);
     }
   } catch (error) {
-    toast.textContent = '❌ Network error. Please check your connection.';
-    toast.style.borderColor = 'var(--orange)';
-    toast.style.opacity = '1';
-    setTimeout(() => { toast.style.opacity = '0'; }, 5000);
+    console.error('Formspree error:', error);
+    showToast('❌ Network error. Please check your connection and try again.', true);
+  } finally {
+    // Re-enable button and restore text
+    submitButton.disabled = false;
+    submitButton.innerHTML = originalButtonText;
   }
 });
 
