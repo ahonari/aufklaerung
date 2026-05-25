@@ -1784,7 +1784,7 @@
     <div class="contact-form-wrap reveal">
       <h3>Get in touch</h3>
       <p>Tell us about your organization and how you'd like to collaborate. We respond within 2 business days.</p>
-      <form id="contactForm" novalidate>
+      <form id="contactForm" action="https://formspree.io/f/mnjrbejk" method="POST" novalidate>
         <div class="form-row">
           <div class="form-group">
             <label for="fname">First name *</label>
@@ -1987,36 +1987,67 @@
   if (timelineFill) timelineObserver.observe(timelineFill);
 
   /* ---- Contact form submit ---- */
-  const form = document.getElementById('contactForm');
-  const toast = document.getElementById('toast');
+/* ---- Contact form submit (Formspree integration) ---- */
+const form = document.getElementById('contactForm');
+const toast = document.getElementById('toast');
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
 
-    // Basic validation
-    const required = form.querySelectorAll('[required]');
-    let valid = true;
-    required.forEach(field => {
-      if (!field.value.trim()) {
-        field.style.borderColor = 'var(--orange)';
-        valid = false;
-      } else {
-        field.style.borderColor = '';
-      }
+  // Basic validation
+  const required = form.querySelectorAll('[required]');
+  let valid = true;
+  required.forEach(field => {
+    if (!field.value.trim()) {
+      field.style.borderColor = 'var(--orange)';
+      valid = false;
+    } else {
+      field.style.borderColor = '';
+    }
+  });
+
+  if (!valid) {
+    toast.textContent = '⚠️ Please fill in all required fields.';
+    toast.style.borderColor = 'var(--orange)';
+    toast.style.opacity = '1';
+    setTimeout(() => { toast.style.opacity = '0'; }, 5000);
+    return;
+  }
+
+  // Submit to Formspree
+  const formData = new FormData(form);
+  
+  try {
+    const response = await fetch(form.action, {
+      method: 'POST',
+      body: formData,
+      headers: { 'Accept': 'application/json' }
     });
 
-    if (!valid) {
-      toast.textContent = '⚠️ Please fill in all required fields.';
-      toast.style.borderColor = 'var(--orange)';
-    } else {
+    if (response.ok) {
       toast.textContent = '✅ Message sent! We\'ll be in touch within 2 business days.';
       toast.style.borderColor = 'var(--s3)';
+      toast.style.opacity = '1';
       form.reset();
+      setTimeout(() => { toast.style.opacity = '0'; }, 5000);
+    } else {
+      const errorData = await response.json();
+      if (errorData.errors) {
+        toast.textContent = `❌ ${errorData.errors.map(e => e.message).join(', ')}`;
+      } else {
+        toast.textContent = '❌ Failed to send. Please try again.';
+      }
+      toast.style.borderColor = 'var(--orange)';
+      toast.style.opacity = '1';
+      setTimeout(() => { toast.style.opacity = '0'; }, 5000);
     }
-
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 4000);
-  });
+  } catch (error) {
+    toast.textContent = '❌ Network error. Please check your connection.';
+    toast.style.borderColor = 'var(--orange)';
+    toast.style.opacity = '1';
+    setTimeout(() => { toast.style.opacity = '0'; }, 5000);
+  }
+});
 
   /* ---- Smooth active nav highlight ---- */
   const sections = document.querySelectorAll('section[id], div[id="cta"]');
