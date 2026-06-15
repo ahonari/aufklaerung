@@ -473,7 +473,7 @@
     .lang-strip-track {
       display: flex;
       gap: 0;
-      animation: scrollLang 28s linear infinite;
+      animation: scrollLang 38s linear infinite;
       white-space: nowrap;
       width: max-content;
     }
@@ -1443,8 +1443,9 @@
     <div class="lang-item"><span class="flag">🇮🇹</span><span>Italian</span><span class="nl-word">Italiaans</span></div>
     <div class="lang-item"><span class="flag">🇫🇷</span><span>French</span><span class="nl-word">Frans</span></div>
     <div class="lang-item"><span class="flag">🇧🇬</span><span>Bulgarian</span><span class="nl-word">Bulgaars</span></div>
+    <div class="lang-item"><span class="flag">🇨🇳</span><span>Chinese</span><span class="nl-word">Chinese</span></div>
+    <div class="lang-item"><span class="flag">🇮🇩</span><span>Indonesian</span><span class="nl-word">Indonesisch</span></div>
     
-    <!-- ADDITIONAL COUNTRIES/DIALECTS COVERED (showing diversity) -->
     <div class="lang-item"><span class="flag">🇦🇫</span><span>Afghan (Dari)</span><span class="nl-word">Dari</span></div>
     <div class="lang-item"><span class="flag">🇲🇦</span><span>Moroccan (Arabic)</span><span class="nl-word">Marokkaans</span></div>
     <div class="lang-item"><span class="flag">🇮🇶</span><span>Iraqi (Arabic)</span><span class="nl-word">Iraaks</span></div>
@@ -1579,7 +1580,7 @@
         </p>
         <ul class="path-feature-list">
           <li>Daily summaries of top Dutch news stories</li>
-          <li>Available in Ukrainian, Turkish, Arabic, Farsi, Polish, Romanian, Italian, French, Bulgarian, Spanish, Russian, Lithuanian</li>
+          <li>Available in Ukrainian, Turkish, Arabic, Farsi, Polish, Romanian, Italian, French, Bulgarian, Spanish, Russian, Lithuanian, Chinese, Indonesian</li>
           <li>Contextual explanations of Dutch systems & culture</li>
           <li>Instant on-demand translation via Telegram command</li>
           <li>No registration, no app download needed</li>
@@ -1934,7 +1935,7 @@
         </p>
         <ul class="org-benefits">
           <li>Immediately useful from the first day of arrival</li>
-          <li>Covers Ukrainian, Arabic, Farsi, Turkish and more</li>
+          <li>Covers Ukrainian, Arabic, Farsi, Turkish, Chinese, Indonesian, and more</li>
           <li>Reduces pressure on caseworkers for routine information</li>
           <li>Supports trauma-informed communication in native language</li>
           <li>Analytics dashboard for partner organizations (pilot)</li>
@@ -2097,6 +2098,8 @@
             <a href="#">Spanish · Spaans</a>
             <a href="#">Lithuanian · Litouws</a>
             <a href="#">Russian · Russisch</a>
+            <a href="#">Chinese · Chinese</a>
+            <a href="#">Indonesian · Indonesisch</a>
           </div>
           
           <a href="#" id="showMoreLink" style="color: var(--orange); font-weight: 500;">+ 7 more →</a>
@@ -2331,7 +2334,7 @@ form.addEventListener('submit', async (e) => {
         showMoreLink.innerHTML = '− show less';
       } else {
         moreLanguages.style.display = 'none';
-        showMoreLink.innerHTML = '+ 7 more →';
+        showMoreLink.innerHTML = '+ 9 more →';
       }
     });
   }
