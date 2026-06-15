@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms & Conditions | StepIn</title>
+  <meta name="description" content="StepIn terms and conditions — rules for using the Telegram bot and website." />
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='0' y='0' width='32' height='6.4' fill='%23008C45'/%3E%3Crect x='0' y='6.4' width='32' height='6.4' fill='%23FFFFFF'/%3E%3Crect x='0' y='12.8' width='32' height='6.4' fill='%23DA0000'/%3E%3Crect x='0' y='19.2' width='32' height='6.4' fill='%23FFD700'/%3E%3Crect x='0' y='25.6' width='32' height='6.4' fill='%230057B7'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='0' y='0' width='32' height='6.4' fill='%23008C45'/%3E%3Crect x='0' y='6.4' width='32' height='6.4' fill='%23FFFFFF'/%3E%3Crect x='0' y='12.8' width='32' height='6.4' fill='%23DA0000'/%3E%3Crect x='0' y='19.2' width='32' height='6.4' fill='%23FFD700'/%3E%3Crect x='0' y='25.6' width='32' height='6.4' fill='%230057B7'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* same style as privacy.html – copied from StepIn index */
+    :root {
+      --orange: #E8601C;
+      --orange-light: #F4894A;
+      --orange-pale: #FDEBD8;
+      --cream: #FAF7F2;
+      --cream-dark: #F0EBE1;
+      --ink: #1A1612;
+      --ink-soft: #3D342C;
+      --ink-muted: #7A6E65;
+      --white: #FFFFFF;
+      --s1: #008C45;
+      --s2: #FFFFFF;
+      --s3: #DA0000;
+      --s4: #FFD700;
+      --s5: #0057B7;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-xl: 40px;
+      --shadow-sm: 0 2px 8px rgba(26,22,18,.08);
+      --shadow-md: 0 8px 32px rgba(26,22,18,.12);
+      --shadow-lg: 0 24px 64px rgba(26,22,18,.16);
+      --font-serif: 'Fraunces', Georgia, serif;
+      --font-sans: 'Inter', system-ui, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--cream);
+      color: var(--ink);
+      line-height: 1.6;
+    }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    .legal-header {
+      padding: 120px 0 48px;
+      background: var(--cream);
+    }
+    .legal-header h1 {
+      font-family: var(--font-serif);
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .legal-header .last-updated {
+      font-size: 0.85rem;
+      color: var(--ink-muted);
+      border-bottom: 2px solid var(--orange-pale);
+      display: inline-block;
+      padding-bottom: 4px;
+    }
+    .legal-content {
+      background: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 48px 56px;
+      margin-bottom: 80px;
+      box-shadow: var(--shadow-sm);
+    }
+    .legal-content h2 {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-top: 32px;
+      margin-bottom: 16px;
+      color: var(--ink);
+    }
+    .legal-content h2:first-of-type {
+      margin-top: 0;
+    }
+    .legal-content p, .legal-content li {
+      color: var(--ink-soft);
+      line-height: 1.7;
+      margin-bottom: 1rem;
+    }
+    .legal-content ul, .legal-content ol {
+      margin: 1rem 0 1.5rem 1.8rem;
+    }
+    .legal-content li {
+      margin-bottom: 0.5rem;
+    }
+    .legal-content a {
+      color: var(--orange);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .legal-content a:hover {
+      color: var(--orange-light);
+    }
+    .legal-content hr {
+      margin: 2rem 0;
+      border: none;
+      border-top: 1px solid var(--cream-dark);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--orange);
+      font-weight: 600;
+      margin-top: 32px;
+      transition: gap 0.2s;
+    }
+    .back-link:hover {
+      gap: 12px;
+      color: var(--orange-light);
+    }
+    footer {
+      background: var(--ink);
+      padding: 32px 0;
+      text-align: center;
+      color: rgba(255,255,255,0.5);
+      font-size: 0.8rem;
+    }
+    @media (max-width: 768px) {
+      .legal-header h1 { font-size: 2.2rem; }
+      .legal-content { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<main>
+  <div class="legal-header">
+    <div class="container">
+      <h1>Terms & Conditions</h1>
+      <div class="last-updated">Last updated: June 2025</div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="legal-content">
+      <p>Welcome to StepIn (“the bot”, “we”, “us”, or “our”). By using the StepIn Telegram bot or visiting our website (<a href="https://stepin.danalytica.com" target="_blank">stepin.danalytica.com</a>), you agree to these Terms & Conditions. If you do not agree, please do not use StepIn.</p>
+
+      <h2>1. What StepIn does</h2>
+      <p>StepIn is a free Telegram bot that delivers daily summaries of Dutch news in your native language or in simplified Dutch (A2/B1/B2). It also provides a Practical Guide (arrival checklist) and a Document Assistant to help interpret official letters. The service is for informational purposes only – it is not official legal or immigration advice.</p>
+
+      <h2>2. Using the bot</h2>
+      <p>You agree to use StepIn in a lawful and respectful manner. You will not:</p>
+      <ul>
+        <li>Attempt to reverse‑engineer, overload, or disrupt the bot’s functionality.</li>
+        <li>Use the bot to harass, threaten, or mislead others.</li>
+        <li>Scrape or bulk‑extract news content for commercial purposes.</li>
+      </ul>
+
+      <h2>3. No official advice</h2>
+      <p>StepIn provides translated news and practical guidance based on publicly available sources (government websites, official announcements). However, we do not guarantee accuracy, completeness, or timeliness. For official decisions (visa applications, tax matters, legal procedures), always consult the relevant government agency or a qualified professional.</p>
+
+      <h2>4. Account and data</h2>
+      <p>You do not need to create an account – the bot uses your Telegram chat ID to remember preferences. You can stop using StepIn at any time. Our <a href="/privacy.html">Privacy Statement</a> explains what data we collect and how to request deletion.</p>
+
+      <h2>5. Intellectual property</h2>
+      <p>The StepIn name, logo, and code are owned by Danalytica. News summaries are derived from original Dutch sources – we do not claim ownership of the underlying news. You may share individual bot messages for personal, non‑commercial use, but you may not republish the summaries in bulk without our permission.</p>
+
+      <h2>6. Limitation of liability</h2>
+      <p>StepIn is provided “as is” and “as available”. To the maximum extent permitted by law, we are not liable for any direct, indirect, incidental, or consequential damages resulting from your use of the bot, including reliance on translated news or practical guides. You use StepIn at your own risk.</p>
+
+      <h2>7. Changes to the service</h2>
+      <p>We may modify or discontinue StepIn (temporarily or permanently) at any time. We will try to give notice via the bot or website, but we are not liable for any interruption.</p>
+
+      <h2>8. Third‑party links</h2>
+      <p>The Practical Guide and Document Assistant may contain links to official websites (overheid.nl, IND, DUO, etc.). We are not responsible for the content or availability of those external sites.</p>
+
+      <h2>9. Governing law</h2>
+      <p>These Terms are governed by the laws of the Netherlands. Any disputes shall be submitted to the exclusive jurisdiction of the courts of the Netherlands.</p>
+
+      <h2>10. Changes to these Terms</h2>
+      <p>We may update these Terms occasionally. The latest version will always be available on this page. Your continued use of StepIn after changes means you accept the new Terms.</p>
+
+      <h2>11. Contact</h2>
+      <p>If you have questions about these Terms, please contact us at:</p>
+      <p><strong>StepIn (c/o Danalytica)</strong><br>
+      Email: <a href="mailto:stepin@danalytica.com">stepin@danalytica.com</a><br>
+      KVK: 67646344</p>
+
+      <hr>
+      <a href="https://stepin.danalytica.com" class="back-link">← Back to StepIn homepage</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <p>© 2025 StepIn – A Telegram bot for immigrants in the Netherlands.</p>
+  </div>
+</footer>
+
+</body>
+</html>
