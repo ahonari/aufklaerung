@@ -473,7 +473,7 @@
     .lang-strip-track {
       display: flex;
       gap: 0;
-      animation: scrollLang 40s linear infinite;
+      animation: scrollLang 48s linear infinite;
       white-space: nowrap;
       width: max-content;
     }
@@ -2146,7 +2146,7 @@
   /* ---- Navbar scroll effect ---- */
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 50);
+    navbar.classList.toggle('scrolled', window.scrollY > 38);
   }, { passive: true });
 
   /* ---- Hamburger / mobile menu ---- */
