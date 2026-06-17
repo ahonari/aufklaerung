@@ -1370,7 +1370,7 @@
           <div class="avatars">
             <span>🇺🇦</span><span>🇹🇷</span><span>🇸🇦</span><span>🇵🇱</span><span>🇷🇴</span>
           </div>
-          <span>For immigrants across <strong>14 languages | 100+ countries</strong></span>
+          <span>For immigrants across <strong>15 languages | 100+ countries</strong></span>
         </div>
         <div class="stripe-bar" style="margin-top:28px;max-width:260px;">
           <span></span><span></span><span></span><span></span><span></span>
@@ -1445,6 +1445,7 @@
     <div class="lang-item"><span class="flag">🇧🇬</span><span>Bulgarian</span><span class="nl-word">Bulgaars</span></div>
     <div class="lang-item"><span class="flag">🇨🇳</span><span>Chinese</span><span class="nl-word">Chinese</span></div>
     <div class="lang-item"><span class="flag">🇮🇩</span><span>Indonesian</span><span class="nl-word">Indonesisch</span></div>
+    <div class="lang-item"><span class="flag">🇬🇧</span><span>English</span><span class="nl-word">Engels</span></div>
     
     <div class="lang-item"><span class="flag">🇦🇫</span><span>Afghan (Dari)</span><span class="nl-word">Dari</span></div>
     <div class="lang-item"><span class="flag">🇲🇦</span><span>Moroccan (Arabic)</span><span class="nl-word">Marokkaans</span></div>
@@ -1580,7 +1581,7 @@
         </p>
         <ul class="path-feature-list">
           <li>Daily summaries of top Dutch news stories</li>
-          <li>Available in Ukrainian, Turkish, Arabic, Farsi, Polish, Romanian, Italian, French, Bulgarian, Spanish, Russian, Lithuanian, Chinese, Indonesian</li>
+          <li>Available in Ukrainian, Turkish, Arabic, Farsi, Polish, Romanian, Italian, French, Bulgarian, Spanish, Russian, English, Lithuanian, Chinese, Indonesian</li>
           <li>Contextual explanations of Dutch systems & culture</li>
           <li>Instant on-demand translation via Telegram command</li>
           <li>No registration, no app download needed</li>
@@ -2045,8 +2046,11 @@
       <span class="cta-lang-pill">🇫🇷 Français</span>
       <span class="cta-lang-pill">🇧🇬 Български</span>
       <span class="cta-lang-pill">🇪🇸 Español</span>
+      <span class="cta-lang-pill">🇬🇧 English</span>
       <span class="cta-lang-pill">🇱🇹 Lietuvių</span>
-      <span class="cta-lang-pill">🇷🇺 Русский</span>
+      <span class="cta-lang-pill">🇷🇺 Русский</span> 
+      <span class="cta-lang-pill">🇨🇳 中文</span>
+      <span class="cta-lang-pill">🇮🇩 Bahasa Indonesia</span>
     </div>
   </div>
 </section>
@@ -2097,12 +2101,13 @@
             <a href="#">Bulgarian · Bulgaars</a>
             <a href="#">Spanish · Spaans</a>
             <a href="#">Lithuanian · Litouws</a>
+            <a href="#">English · Engels</a>
             <a href="#">Russian · Russisch</a>
             <a href="#">Chinese · Chinese</a>
             <a href="#">Indonesian · Indonesisch</a>
           </div>
           
-          <a href="#" id="showMoreLink" style="color: var(--orange); font-weight: 500;">+ 7 more →</a>
+          <a href="#" id="showMoreLink" style="color: var(--orange); font-weight: 500;">+ 10 more →</a>
         </div>
       </div>
     </div>
@@ -2141,7 +2146,7 @@
   /* ---- Navbar scroll effect ---- */
   const navbar = document.getElementById('navbar');
   window.addEventListener('scroll', () => {
-    navbar.classList.toggle('scrolled', window.scrollY > 40);
+    navbar.classList.toggle('scrolled', window.scrollY > 42);
   }, { passive: true });
 
   /* ---- Hamburger / mobile menu ---- */
@@ -2334,7 +2339,7 @@ form.addEventListener('submit', async (e) => {
         showMoreLink.innerHTML = '− show less';
       } else {
         moreLanguages.style.display = 'none';
-        showMoreLink.innerHTML = '+ 9 more →';
+        showMoreLink.innerHTML = '+ 10 more →';
       }
     });
   }
