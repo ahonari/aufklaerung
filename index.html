@@ -2207,9 +2207,7 @@
   }, { threshold: 0.5 });
   if (timelineFill) timelineObserver.observe(timelineFill);
 
-
-/* ---- Contact form submit (Formspree integration) ---- */
-/* ---- Contact form submit (Formspree integration) ---- */
+/* ---- Contact form submit (Traditional, works with default reCAPTCHA) ---- */
 const form = document.getElementById('contactForm');
 const toast = document.getElementById('toast');
 
@@ -2227,13 +2225,10 @@ function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  // Get submit button for loading state
-  const submitButton = form.querySelector('button[type="submit"]');
-  const originalButtonText = submitButton.innerHTML;
-
+form.addEventListener('submit', function(e) {
+  // Don't prevent default - let the form submit normally
+  // But we can still validate before submission
+  
   // Reset previous error styles
   const allFields = form.querySelectorAll('input, select, textarea');
   allFields.forEach(field => field.style.borderColor = '');
@@ -2254,6 +2249,7 @@ form.addEventListener('submit', async (e) => {
   // Email format validation
   const emailField = document.getElementById('email');
   if (emailField && emailField.value.trim() && !isValidEmail(emailField.value.trim())) {
+    e.preventDefault(); // Stop submission
     emailField.style.borderColor = 'var(--orange)';
     showToast('⚠️ Please enter a valid email address (e.g., name@domain.com)', true);
     emailField.focus();
@@ -2261,58 +2257,16 @@ form.addEventListener('submit', async (e) => {
   }
 
   if (!valid) {
+    e.preventDefault(); // Stop submission
     showToast('⚠️ Please fill in all required fields.', true);
     if (firstInvalid) firstInvalid.focus();
     return;
   }
-
-  // Submit to Formspree
-  const formData = new FormData(form);
   
-  // Disable button and show loading state
-  submitButton.disabled = true;
-  submitButton.innerHTML = 'Sending...';
-  
-  try {
-    const response = await fetch(form.action, {
-      method: 'POST',
-      body: formData,
-      headers: { 
-        'Accept': 'application/json' 
-      }
-    });
-
-    if (response.ok) {
-      showToast('✅ Message sent! We\'ll be in touch within 2 business days.');
-      form.reset();
-      // Reset select dropdown to default
-      const select = document.getElementById('orgtype');
-      if (select) select.selectedIndex = 0;
-    } else {
-      // Try to parse error response
-      try {
-        const errorData = await response.json();
-        if (errorData.errors) {
-          showToast(`❌ ${errorData.errors.map(e => e.message).join(', ')}`, true);
-        } else if (errorData.error) {
-          showToast(`❌ ${errorData.error}`, true);
-        } else {
-          showToast(`❌ Submission failed (${response.status}). Please try again.`, true);
-        }
-      } catch {
-        // If response isn't JSON
-        showToast(`❌ Submission failed (${response.status}). Please try again.`, true);
-      }
-    }
-  } catch (error) {
-    console.error('Formspree error:', error);
-    showToast('❌ Network error. Please check your connection and try again.', true);
-  } finally {
-    // Re-enable button and restore text
-    submitButton.disabled = false;
-    submitButton.innerHTML = originalButtonText;
-  }
+  // If validation passes, the form submits normally
+  // User will be redirected to Formspree's CAPTCHA page then thank you page
 });
+  
   /* ---- Smooth active nav highlight ---- */
   const sections = document.querySelectorAll('section[id], div[id="cta"]');
   const navLinks = document.querySelectorAll('.nav-links a');
